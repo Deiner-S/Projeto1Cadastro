@@ -2,41 +2,39 @@ package DAO;
 
 import Domain.Cliente;
 
+import java.lang.annotation.Retention;
 import java.util.*;
 
 public class ClienteMapDAO implements IClienteDAO {
 
 
-    private final Map<Integer, Cliente> clientes = new HashMap<>();;
+    private final Map<Long, Cliente> clientes = new HashMap<>();;
 
-    public Map<Integer, Cliente> getClientes() {
+    public Map<Long, Cliente> getClientes() {
         return clientes;
     }
 
     @Override
-    public void inserirCliente(String[] dadosSeparados) {
+    public String inserirCliente(String[] dadosSeparados) {
+        String stringCpf = dadosSeparados[1].replaceAll("[^0-9]+","");
+        Long longCpf = Long.parseLong(stringCpf);
+        Cliente construtorCliente = new Cliente(dadosSeparados[0],longCpf,dadosSeparados[2],dadosSeparados[3],dadosSeparados[4]);
 
-        dadosSeparados[1].replaceAll("[^0-9]","");
-        dadosSeparados[1].replaceAll(" ","");
-        Integer cpf = Integer.parseInt(dadosSeparados[1]);
-
-        Cliente construtorCliente = new Cliente(dadosSeparados[0],cpf,dadosSeparados[2],dadosSeparados[3],dadosSeparados[4]);
-
-        clientes.put(cpf,construtorCliente);
-
+        clientes.put(longCpf,construtorCliente);
+        return "Cadastro realizado com sucesso!\n";
     }
 
     @Override
-    public String alterarCliente(Integer cpf, String editar,String novaInformacao) {
+    public String alterarCliente(Long cpf, String editar,String novaInformacao) {
 
         if(editar.equalsIgnoreCase("nome")){
             clientes.get(cpf).setNome(novaInformacao);
 
 
         }else if(editar.equalsIgnoreCase("cpf")){
-            novaInformacao.replaceAll("[^0-9]","");
-            novaInformacao.replaceAll(" ","");
-            Integer novoCpf = Integer.parseInt(novaInformacao);
+            String stringCpf = novaInformacao.replaceAll("[^0-9]+","");
+
+            Long novoCpf = Long.parseLong(stringCpf);
             clientes.get(cpf).setCpf(novoCpf);
 
 
@@ -53,27 +51,39 @@ public class ClienteMapDAO implements IClienteDAO {
 
 
         }else{
-            return "Erro ao alterar cliente";
+            return "Erro ao alterar cliente\n";
         }
 
 
-        return "Dados alterados com sucesso!";
+        return "Dados alterados com sucesso!\n";
     }
 
     @Override
-    public String excluirCliente(Integer cpf) {
+    public String excluirCliente(Long cpf) {
         clientes.remove(cpf);
-        return "Cliente excluido com sucesso!";
+        return "Cliente excluido com sucesso!\n";
     }
 
     @Override
-    public void listarCliente() {
-        clientes.values().forEach(cliente -> System.out.println("Nome: "+cliente.getNome()+"\nCPF: "+cliente.getCpf()+"\nTelefone: "+cliente.getTelefone()+"\nEmail: "+cliente.getEmail()));
+    public String listarCliente() {
+        clientes.values().forEach(cliente -> System.out.println(
+                "=================================================\n" +
+                "Nome: "+cliente.getNome()+"\nCPF: "+cliente.getCpf()+"\nTelefone: "
+                +cliente.getTelefone()+"\nEmail: "+cliente.getEmail()
+                ));
+
+        return "Foram encontrados " + clientes.size() + " com sucesso!\n\n";
     }
 
     @Override
-    public Cliente buscarCliente(Integer cpf) {
+    public String buscarCliente(Long cpf) {
+        if(clientes.containsKey(cpf)){
+        System.out.println(clientes.get(cpf));
+            return "Cadastro encontrado!\n" ;
 
-        return clientes.get(cpf);
+        }else {
+            return "Cadastro não encontrado.\n" ;
+        }
+
     }
 }

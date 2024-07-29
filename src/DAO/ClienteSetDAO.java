@@ -13,16 +13,16 @@ public class ClienteSetDAO implements IClienteDAO {
     }
 
     @Override
-    public void inserirCliente(String[] dadosSeparados) {
-        dadosSeparados[1].replaceAll("[^0-9]","");
-        dadosSeparados[1].replaceAll(" ","");
-        Integer cpf = Integer.parseInt(dadosSeparados[1]);
-        Cliente construtorCliente = new Cliente(dadosSeparados[0],cpf,dadosSeparados[2],dadosSeparados[3],dadosSeparados[4]);
+    public String inserirCliente(String[] dadosSeparados) {
+        String stringCpf = dadosSeparados[1].replaceAll("[^0-9]+","");
+        Long longCpf = Long.parseLong(stringCpf);
+        Cliente construtorCliente = new Cliente(dadosSeparados[0],longCpf,dadosSeparados[2],dadosSeparados[3],dadosSeparados[4]);
         clientes.add(construtorCliente);
+        return "Cadastro realizado com sucesso!";
     }
 
     @Override
-    public String alterarCliente(Integer cpf, String editar, String novaInformacao) {
+    public String alterarCliente(Long cpf, String editar, String novaInformacao) {
         Optional<Cliente> optionalCliente = clientes.stream()
                .filter( p -> p.getCpf().equals(cpf)).findFirst();
 
@@ -34,9 +34,9 @@ public class ClienteSetDAO implements IClienteDAO {
 
 
             }else if(editar.equalsIgnoreCase("cpf")){
-                novaInformacao.replaceAll("[^0-9]","");
-                novaInformacao.replaceAll(" ","");
-                Integer novoCpf = Integer.parseInt(novaInformacao);
+                String stringCpf = novaInformacao.replaceAll("[^0-9]+","");
+
+                Long novoCpf = Long.parseLong(stringCpf);
                 cliente.setCpf(novoCpf);
 
 
@@ -63,7 +63,7 @@ public class ClienteSetDAO implements IClienteDAO {
     }
 
     @Override
-    public String excluirCliente(Integer cpf) {
+    public String excluirCliente(Long cpf) {
         Optional<Cliente> optionalCliente = clientes.stream()
                 .filter( p -> p.getCpf().equals(cpf)).findFirst();
         clientes.remove(optionalCliente.get());
@@ -71,14 +71,23 @@ public class ClienteSetDAO implements IClienteDAO {
     }
 
     @Override
-    public void listarCliente() {
+    public String listarCliente() {
         clientes.forEach(cliente -> System.out.println("Nome: "+cliente.getNome()+"\nCPF: "+cliente.getCpf()+"\nTelefone: "+cliente.getTelefone()+"\nEmail: "+cliente.getEmail()));
+        return "Foram encontrados "+clientes.size()+" registros!";
     }
 
     @Override
-    public Cliente buscarCliente(Integer cpf) {
+    public String buscarCliente(Long cpf) {
         Optional<Cliente> optionalCliente = clientes.stream()
                 .filter( p -> p.getCpf().equals(cpf)).findFirst();
-        return optionalCliente.get();
+
+        if(optionalCliente.isPresent()){
+            System.out.println(optionalCliente.get());
+            return "Cadastro encontrado!" ;
+        }else{
+            return "Cadastro não encontrado.";
+        }
+
+
     }
 }

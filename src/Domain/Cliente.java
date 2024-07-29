@@ -5,14 +5,14 @@ import java.util.Objects;
 public class Cliente {
 
     private String nome;
-    private Integer cpf;
+    private Long cpf;
     private String telefone;
     private String email;
     private String endereco;
 
 
 
-    public Cliente(String nome, Integer cpf, String telefone, String email, String endereco) {
+    public Cliente(String nome, Long cpf, String telefone, String email, String endereco) {
         this.nome = nome;
         this.cpf = cpf;
         this.telefone = telefone;
@@ -28,11 +28,11 @@ public class Cliente {
         this.nome = nome;
     }
 
-    public Integer getCpf() {
+    public Long getCpf() {
         return cpf;
     }
 
-    public void setCpf(Integer cpf) {
+    public void setCpf(Long cpf) {
         this.cpf = cpf;
     }
 
