@@ -4,15 +4,15 @@ import Domain.Cliente;
 
 public interface IClienteDAO {
 
-    public String inserirCliente(String[] dadosSeparados);
+    public String cadastrarCliente(String[] dadosSeparados);
 
-    public String alterarCliente(Long cpf, String editar,String novaInformacao);
+    public String alterarCliente(String cpf, String editar,String novaInformacao);
 
-    public String excluirCliente(Long cpf);
+    public String excluirCliente(String cpf);
 
     public String listarCliente();
 
-    public String buscarCliente(Long cpf);
+    public String buscarCliente(String cpf);
 
 
 }

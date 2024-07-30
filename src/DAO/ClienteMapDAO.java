@@ -2,88 +2,111 @@ package DAO;
 
 import Domain.Cliente;
 
-import java.lang.annotation.Retention;
+import javax.swing.*;
 import java.util.*;
 
 public class ClienteMapDAO implements IClienteDAO {
 
 
-    private final Map<Long, Cliente> clientes = new HashMap<>();;
-
-    public Map<Long, Cliente> getClientes() {
-        return clientes;
-    }
+    private final Map<Long, Cliente> clientes = new HashMap<>();
 
     @Override
-    public String inserirCliente(String[] dadosSeparados) {
-        String stringCpf = dadosSeparados[1].replaceAll("[^0-9]+","");
-        Long longCpf = Long.parseLong(stringCpf);
-        Cliente construtorCliente = new Cliente(dadosSeparados[0],longCpf,dadosSeparados[2],dadosSeparados[3],dadosSeparados[4]);
+    public String cadastrarCliente(String[] dadosSeparados) {
+        if(isValidCpf(dadosSeparados[1]) && isValidEmail(dadosSeparados[3])){
+            return "CPF Ou Email Invalido";
+        }
+            Cliente construtorCliente = new Cliente(dadosSeparados[0],converterCpf(dadosSeparados[1]),dadosSeparados[2],dadosSeparados[3],dadosSeparados[4]);
 
-        clientes.put(longCpf,construtorCliente);
-        return "Cadastro realizado com sucesso!\n";
+            if(clientes.containsKey(converterCpf(dadosSeparados[1]))){
+
+                return "Cliente já está cadastrado";
+            }else{
+                clientes.put(converterCpf(dadosSeparados[1]),construtorCliente);
+                return "Cliente cadastrado com sucesso!";
+            }
+
+
+
     }
 
+
+
     @Override
-    public String alterarCliente(Long cpf, String editar,String novaInformacao) {
-
-        if(editar.equalsIgnoreCase("nome")){
-            clientes.get(cpf).setNome(novaInformacao);
-
-
-        }else if(editar.equalsIgnoreCase("cpf")){
-            String stringCpf = novaInformacao.replaceAll("[^0-9]+","");
-
-            Long novoCpf = Long.parseLong(stringCpf);
-            clientes.get(cpf).setCpf(novoCpf);
-
-
-        }else if(editar.equalsIgnoreCase("telefone")){
-            clientes.get(cpf).setTelefone(novaInformacao);
-
-
-        }else if(editar.equalsIgnoreCase("email")){
-            clientes.get(cpf).setEmail(novaInformacao);
-
-
-        }else if(editar.equalsIgnoreCase("Endereco")||editar.equalsIgnoreCase("endereço")){
-        clientes.get(cpf).setEndereco(novaInformacao);
-
+    public String alterarCliente(String cpf, String editar,String novaInformacao) {
+        if(!isValidCpf(cpf)){
+            return "CPF invalido.";
+        }else if (!editar.matches("(?i)nome|cpf|telefone|email|endereco")) {
+            return "Opção de edição invalida.";
 
         }else{
-            return "Erro ao alterar cliente\n";
+
+            if(editar.equalsIgnoreCase("nome")){
+                clientes.get(converterCpf(cpf)).setNome(novaInformacao);
+            }else if(editar.equalsIgnoreCase("cpf")){
+                if(!isValidCpf(novaInformacao)){
+                    return "Novo CPF invalido!.";
+                }
+                clientes.get(converterCpf(cpf)).setCpf(converterCpf(novaInformacao));
+            }else if(editar.equalsIgnoreCase("telefone")){
+                clientes.get(converterCpf(cpf)).setTelefone(novaInformacao);
+            }else if(editar.equalsIgnoreCase("email")){
+                if (!isValidEmail(novaInformacao)) {
+                    return "Novo Email invalido!.";
+                }
+                clientes.get(converterCpf(cpf)).setEmail(novaInformacao);
+            }else if(editar.equalsIgnoreCase("Endereco")||editar.equalsIgnoreCase("endereço")){
+            clientes.get(converterCpf(cpf)).setEndereco(novaInformacao);
+            }
+
         }
 
 
-        return "Dados alterados com sucesso!\n";
+        return "Cliente cadastrado!";
     }
 
     @Override
-    public String excluirCliente(Long cpf) {
-        clientes.remove(cpf);
-        return "Cliente excluido com sucesso!\n";
+    public String excluirCliente(String cpf) {
+        if(!isValidCpf(cpf)){
+            return "CPF invalido.";
+        }
+            clientes.remove(converterCpf(cpf));
+            return "Cadastro excluido com sucesso!";
+
+
+
     }
 
     @Override
     public String listarCliente() {
-        clientes.values().forEach(cliente -> System.out.println(
-                "=================================================\n" +
-                "Nome: "+cliente.getNome()+"\nCPF: "+cliente.getCpf()+"\nTelefone: "
-                +cliente.getTelefone()+"\nEmail: "+cliente.getEmail()
-                ));
-
-        return "Foram encontrados " + clientes.size() + " com sucesso!\n\n";
+        return "Lista Clientes: \n\n" + clientes.values() + "\n\n" "quantidad" + clientes.size();
     }
 
     @Override
-    public String buscarCliente(Long cpf) {
-        if(clientes.containsKey(cpf)){
-        System.out.println(clientes.get(cpf));
-            return "Cadastro encontrado!\n" ;
-
-        }else {
-            return "Cadastro não encontrado.\n" ;
+    public String buscarCliente(String cpf) {
+        if(!isValidCpf(cpf)){
+            return "CPF invalido.";
         }
 
+        if(clientes.containsKey(converterCpf(cpf))){
+            return "Cliente encontrado!\n"+clientes.get(converterCpf(cpf)) ;
+
+        }else {
+            return "Cadastro não encontrado" ;
+        }
+    }
+
+    public Long converterCpf(String cpf){
+
+        String stringCpf = cpf.replaceAll("\\D","");
+
+        return Long.parseLong(stringCpf);
+    }
+
+    public boolean isValidCpf(String cpf){
+        return cpf.matches("\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}");
+    }
+
+    public boolean isValidEmail(String email){
+        return email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
     }
 }

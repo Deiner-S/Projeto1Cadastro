@@ -2,6 +2,7 @@ package DAO;
 
 import Domain.Cliente;
 
+import javax.swing.*;
 import java.util.*;
 
 public class ClienteSetDAO implements IClienteDAO {
@@ -13,81 +14,76 @@ public class ClienteSetDAO implements IClienteDAO {
     }
 
     @Override
-    public String inserirCliente(String[] dadosSeparados) {
-        String stringCpf = dadosSeparados[1].replaceAll("[^0-9]+","");
-        Long longCpf = Long.parseLong(stringCpf);
-        Cliente construtorCliente = new Cliente(dadosSeparados[0],longCpf,dadosSeparados[2],dadosSeparados[3],dadosSeparados[4]);
+    public String cadastrarCliente(String[] dadosSeparados) {
+
+
+        Cliente construtorCliente = new Cliente(dadosSeparados[0],converterCpf(dadosSeparados[1]),dadosSeparados[2],dadosSeparados[3],dadosSeparados[4]);
         clientes.add(construtorCliente);
-        return "Cadastro realizado com sucesso!";
+        return "Cliente Cadastrado com sucesso!";
     }
 
     @Override
-    public String alterarCliente(Long cpf, String editar, String novaInformacao) {
+    public String alterarCliente(String cpf, String editar, String novaInformacao) {
         Optional<Cliente> optionalCliente = clientes.stream()
-               .filter( p -> p.getCpf().equals(cpf)).findFirst();
+               .filter( p -> p.getCpf().equals(converterCpf(cpf))).findFirst();
 
         if (optionalCliente.isPresent()) {
-            Cliente cliente = optionalCliente.get();
-            clientes.remove(cliente);
+            clientes.remove(optionalCliente.get());
+
             if(editar.equalsIgnoreCase("nome")){
-                cliente.setNome(novaInformacao);
-
-
+                optionalCliente.get().setNome(novaInformacao);
             }else if(editar.equalsIgnoreCase("cpf")){
-                String stringCpf = novaInformacao.replaceAll("[^0-9]+","");
-
-                Long novoCpf = Long.parseLong(stringCpf);
-                cliente.setCpf(novoCpf);
-
-
+                optionalCliente.get().setCpf(converterCpf(editar));
             }else if(editar.equalsIgnoreCase("telefone")){
-                cliente.setTelefone(novaInformacao);
-
+                optionalCliente.get().setTelefone(novaInformacao);
             }else if(editar.equalsIgnoreCase("email")){
-                cliente.setEmail(novaInformacao);
-
+                optionalCliente.get().setEmail(novaInformacao);
             }else if(editar.equalsIgnoreCase("Endereco") || editar.equalsIgnoreCase("Endereço" )){
-                cliente.setEndereco(novaInformacao);
+                optionalCliente.get().setEndereco(novaInformacao);
 
             }else{
-                return "Erro ao alterar cliente";
+                return "";
             }
-            clientes.add(cliente);
-        } else {
-            return "Pessoa não encontrada";
+            clientes.add(optionalCliente.get());
+        }else{
+            return "";
         }
-
-
-
-        return "Dados alterados com sucesso";
+        return "";
     }
 
     @Override
-    public String excluirCliente(Long cpf) {
+    public boolean excluirCliente(String cpf) {
         Optional<Cliente> optionalCliente = clientes.stream()
-                .filter( p -> p.getCpf().equals(cpf)).findFirst();
+                .filter( p -> p.getCpf().equals(converterCpf(cpf))).findFirst();
+
         clientes.remove(optionalCliente.get());
-        return "Cliente excluido";
+        return true;
     }
 
     @Override
-    public String listarCliente() {
-        clientes.forEach(cliente -> System.out.println("Nome: "+cliente.getNome()+"\nCPF: "+cliente.getCpf()+"\nTelefone: "+cliente.getTelefone()+"\nEmail: "+cliente.getEmail()));
-        return "Foram encontrados "+clientes.size()+" registros!";
+    public int listarCliente() {
+        JOptionPane.showMessageDialog(null, clientes.toString());
+        return clientes.size();
     }
 
     @Override
-    public String buscarCliente(Long cpf) {
+    public boolean buscarCliente(String cpf) {
         Optional<Cliente> optionalCliente = clientes.stream()
-                .filter( p -> p.getCpf().equals(cpf)).findFirst();
+                .filter( p -> p.getCpf().equals(converterCpf(cpf))).findFirst();
 
         if(optionalCliente.isPresent()){
             System.out.println(optionalCliente.get());
-            return "Cadastro encontrado!" ;
+            return true;
         }else{
-            return "Cadastro não encontrado.";
+            return false;
         }
 
 
+    }
+    public Long converterCpf(String cpf){
+
+        String stringCpf = cpf.replaceAll("\\D","");
+
+        return Long.parseLong(stringCpf);
     }
 }
