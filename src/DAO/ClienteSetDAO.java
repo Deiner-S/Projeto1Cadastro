@@ -4,7 +4,7 @@ import Domain.Cliente;
 import java.util.*;
 
 public class ClienteSetDAO implements IClienteDAO {
-    private ValidacaoUtil validacaoUtil;
+    private ValidacaoUtil validacaoUtil = new ValidacaoUtil();
     private Set<Cliente> clientes = new HashSet<>();
 
 
@@ -37,34 +37,40 @@ public class ClienteSetDAO implements IClienteDAO {
         }else{
             Optional<Cliente> optionalCliente = clientes.stream().filter(p -> p.getCpf().equals(validacaoUtil.converterCpf(cpf))).findFirst();
             if(optionalCliente.isPresent()){
-                Cliente cliente = optionalCliente.get();
-                clientes.remove(cliente);
+                Cliente clienteEdicao = optionalCliente.get();
+                clientes.remove(clienteEdicao);
 
                 switch (editar.toLowerCase()){
                     case "nome":
-                        cliente.setNome(novaInformacao);
+                        clienteEdicao.setNome(novaInformacao);
                         break;
                     case "cpf":
                         if(!validacaoUtil.isValidCpf(novaInformacao)){
                             return "Novo CPF invalido";
                         }
-                        cliente.setCpf(validacaoUtil.converterCpf(novaInformacao));
+                        Optional<Cliente> optionalCpf = clientes.stream().filter(p -> p.getCpf().equals(validacaoUtil.converterCpf(novaInformacao))).findFirst();
+
+                        if (optionalCpf.isPresent()){
+                            return "Novo CPF informado já está associado a outro cadastro.";
+                         }else{
+                            clienteEdicao.setCpf(validacaoUtil.converterCpf(novaInformacao));
+                        }
                         break;
                     case "telefone":
-                        cliente.setTelefone(novaInformacao);
+                        clienteEdicao.setTelefone(novaInformacao);
                         break;
                     case "email":
                         if(!validacaoUtil.isValidEmail(novaInformacao)){
                             return "Novo Email Invalido";
                         }
-                        cliente.setEmail(novaInformacao);
+                        clienteEdicao.setEmail(novaInformacao);
                         break;
                     case "endereco":
-                        cliente.setEndereco(novaInformacao);
+                        clienteEdicao.setEndereco(novaInformacao);
                         break;
 
                 }
-
+                clientes.add(clienteEdicao);
             }else{
                 return "Cliente não encontrado";
             }
@@ -83,7 +89,7 @@ public class ClienteSetDAO implements IClienteDAO {
         if(optionalCliente.isPresent()){
             clientes.remove(optionalCliente.get());
         }else {
-            return "Cliente não encontrado";
+            return "Cliente não encontrado ou já excluido";
         }
         return "Cliente excluido com sucesso!";
     }

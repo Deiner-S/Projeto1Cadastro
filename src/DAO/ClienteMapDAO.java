@@ -53,7 +53,12 @@ public class ClienteMapDAO implements IClienteDAO {
                     if(clientes.containsKey(novoCPF)){
                         return "CPF informado já está vinculado à uma conta.";
                     }else{
-                        clientes.get(longCPF).setCpf(novoCPF);
+                        Cliente clienteAlteracao = clientes.get(longCPF);
+                        clientes.remove(longCPF);
+
+                        clienteAlteracao.setCpf(novoCPF);
+                        clientes.put(novoCPF,clienteAlteracao);
+
                     }
 
                     break;
