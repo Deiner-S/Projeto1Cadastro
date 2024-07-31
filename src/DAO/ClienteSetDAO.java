@@ -29,26 +29,82 @@ public class ClienteSetDAO implements IClienteDAO {
 
     @Override
     public String alterarCliente(String cpf, String editar, String novaInformacao) {
+        if(!validacaoUtil.isValidCpf(cpf)){
+            return "Não foi possível buscar cadastro CPF invalido";
+        }else if(!editar.matches("(?i)nome|cpf|telefone|email|endereco")){
+            return "Opção de edição invalida.";
 
+        }else{
+            Optional<Cliente> optionalCliente = clientes.stream().filter(p -> p.getCpf().equals(validacaoUtil.converterCpf(cpf))).findFirst();
+            if(optionalCliente.isPresent()){
+                Cliente cliente = optionalCliente.get();
+                clientes.remove(cliente);
 
+                switch (editar.toLowerCase()){
+                    case "nome":
+                        cliente.setNome(novaInformacao);
+                        break;
+                    case "cpf":
+                        if(!validacaoUtil.isValidCpf(novaInformacao)){
+                            return "Novo CPF invalido";
+                        }
+                        cliente.setCpf(validacaoUtil.converterCpf(novaInformacao));
+                        break;
+                    case "telefone":
+                        cliente.setTelefone(novaInformacao);
+                        break;
+                    case "email":
+                        if(!validacaoUtil.isValidEmail(novaInformacao)){
+                            return "Novo Email Invalido";
+                        }
+                        cliente.setEmail(novaInformacao);
+                        break;
+                    case "endereco":
+                        cliente.setEndereco(novaInformacao);
+                        break;
 
+                }
 
+            }else{
+                return "Cliente não encontrado";
+            }
 
-        return "";
+            return "Cliente alterado com sucesso!";
+        }
+
     }
 
     @Override
     public String excluirCliente(String cpf) {
-        return "";
+        if(!validacaoUtil.isValidCpf(cpf)){
+            return "CPF invalido";
+        }
+        Optional<Cliente> optionalCliente = clientes.stream().filter(p -> p.getCpf().equals(validacaoUtil.converterCpf(cpf))).findFirst();
+        if(optionalCliente.isPresent()){
+            clientes.remove(optionalCliente.get());
+        }else {
+            return "Cliente não encontrado";
+        }
+        return "Cliente excluido com sucesso!";
     }
 
     @Override
     public String listarCliente() {
-        return "";
+        return "Lista Clientes: \n\n" + clientes + "\n\n" + "quantidad " + clientes.size();
     }
 
     @Override
     public String buscarCliente(String cpf) {
-        return "";
+        if(!validacaoUtil.isValidCpf(cpf)){
+            return "CPF invalido";
+        }
+        Optional<Cliente> optionalCliente = clientes.stream().filter(p -> p.getCpf().equals(validacaoUtil.converterCpf(cpf))).findFirst();
+        if(optionalCliente.isPresent()){
+            Cliente cliente = optionalCliente.get();
+            return "Cliente encontrado: \n\nNome: "+ cliente.getNome()+"\nCPF: "+cliente.getCpf()+"\nTelefone: "+cliente.getTelefone()+"\nEmail: "+cliente.getEmail()+"\nEndereço: "+cliente.getEndereco();
+        }else {
+            return "Cliente não encontrado";
+        }
+
     }
 }

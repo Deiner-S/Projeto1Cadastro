@@ -5,7 +5,7 @@ import java.util.*;
 
 public class ClienteMapDAO implements IClienteDAO {
 
-    private ValidacaoUtil validacaoUtil;
+    private ValidacaoUtil validacaoUtil = new ValidacaoUtil();
     private final Map<Long, Cliente> clientes = new HashMap<>();
 
     @Override
@@ -49,7 +49,13 @@ public class ClienteMapDAO implements IClienteDAO {
                     if(!validacaoUtil.isValidCpf(novaInformacao)){
                         return "Novo CPF invalido!.";
                     }
-                    clientes.get(longCPF).setCpf(validacaoUtil.converterCpf(novaInformacao));
+                    Long novoCPF = validacaoUtil.converterCpf(novaInformacao);
+                    if(clientes.containsKey(novoCPF)){
+                        return "CPF informado já está vinculado à uma conta.";
+                    }else{
+                        clientes.get(longCPF).setCpf(novoCPF);
+                    }
+
                     break;
 
                 case "telefone":
@@ -79,8 +85,16 @@ public class ClienteMapDAO implements IClienteDAO {
         if(!validacaoUtil.isValidCpf(cpf)){
             return "CPF invalido.";
         }
-            clientes.remove(validacaoUtil.converterCpf(cpf));
+        Long longCPF = validacaoUtil.converterCpf(cpf);
+        if(clientes.containsKey(longCPF)){
+            clientes.remove(longCPF);
             return "Cadastro excluido com sucesso!";
+        }else{
+            return "Cliente já excluido ou não está cadastrado";
+        }
+
+
+
 
 
 
@@ -88,7 +102,7 @@ public class ClienteMapDAO implements IClienteDAO {
 
     @Override
     public String listarCliente() {
-        return "Lista Clientes: \n\n" + clientes.values() + "\n\n" + "quantidad" + clientes.size();
+        return "Lista Clientes: \n\n" + clientes.values() + "\n\n" + "Foi encontrado " + clientes.size()+" cadastros";
     }
 
     @Override

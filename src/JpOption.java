@@ -26,24 +26,28 @@ public static void main(String[] args) {
                 excluirCadastro(clienteMapDAO);
 
             } else if (opcao.matches("(?i)ExibirTodos|4")) {
-                System.out.println(clienteMapDAO.listarCliente());
+                listarClientes(clienteMapDAO);
 
             } else if (opcao.matches("(?i)BuscarCadastro|5")) {
                 buscarCadastro(clienteMapDAO);
 
             } else if(opcao.matches("(?i)Sair|6")) {
                 porta = false;
-                JOptionPane.showMessageDialog(null, "Finalizando sistema de cadastro!\n");
+                JOptionPane.showMessageDialog(null, "Finalizando sistema de cadastro!\n","Systema de Cadastro", JOptionPane.INFORMATION_MESSAGE);
 
 
             }else{
-                JOptionPane.showMessageDialog(null, "Opção invalida tente novamente. \n");
+                JOptionPane.showMessageDialog(null, "Opção invalida tente novamente.\n", " Systema de Cadastro", JOptionPane.INFORMATION_MESSAGE);
 
             }
 
     }
 
 
+}
+
+private static void listarClientes(ClienteMapDAO clienteMapDAO) {
+    JOptionPane.showMessageDialog(null,clienteMapDAO.listarCliente(),"Exibir todos os cadastros", JOptionPane.INFORMATION_MESSAGE);
 }
 
 /**
@@ -67,9 +71,9 @@ private static void excluirCadastro(ClienteMapDAO clienteMapDAO) {
  */
 private static void editarCadastro(ClienteMapDAO clienteMapDAO) {
 
-    String cpf = JOptionPane.showInputDialog(null, "Informe o cpf","Editar cadastro", JOptionPane.INFORMATION_MESSAGE);
-    String editar = JOptionPane.showInputDialog(null, "Informe o dado que gostaria de editar: nome, cpf, telefone, email, endereco","Editar cadastro", JOptionPane.INFORMATION_MESSAGE);
-    String novoDado = JOptionPane.showInputDialog(null, "Informe o novo " + editar,"Editar cadastro", JOptionPane.INFORMATION_MESSAGE);
+    String cpf = JOptionPane.showInputDialog(null, "Informe o CPF do cadastro que será editado","Editar cadastro", JOptionPane.INFORMATION_MESSAGE);
+    String editar = JOptionPane.showInputDialog(null, "Informe o dado que gostaria de editar: nome, cpf, telefone, email, endereco\n\n OBS: somente é possivel alterar 1 por vez","Editar cadastro", JOptionPane.INFORMATION_MESSAGE);
+    String novoDado = JOptionPane.showInputDialog(null, "Digite a nova informação de cadastro","Editar cadastro", JOptionPane.INFORMATION_MESSAGE);
     JOptionPane.showMessageDialog(null,clienteMapDAO.alterarCliente(cpf, editar, novoDado),"Editar cadastro",JOptionPane.INFORMATION_MESSAGE );
 
 }
