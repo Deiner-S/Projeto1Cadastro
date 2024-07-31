@@ -52,7 +52,7 @@ public static void main(String[] args) {
 private static void buscarCadastro(ClienteMapDAO clienteMapDAO) {
     String cpf = JOptionPane.showInputDialog(null,"Informe o cpf", JOptionPane.INFORMATION_MESSAGE);
     JOptionPane.showMessageDialog(null,clienteMapDAO.buscarCliente(cpf),"Buscar cadastro",JOptionPane.INFORMATION_MESSAGE );
-   
+
 }
 /**
  *
@@ -78,8 +78,8 @@ private static void editarCadastro(ClienteMapDAO clienteMapDAO) {
  */
 private static void cadastrar(ClienteMapDAO clienteMapDAO) {
     String dadosJuntos = JOptionPane.showInputDialog(null,"Digite os dados do cliente separados por virgula nome,cpf,telefone,email,endereco: ", "Green dinner", JOptionPane.INFORMATION_MESSAGE);
-    String[] dadosSeparados = dadosJuntos.split(",");
-    JOptionPane.showMessageDialog(null,clienteMapDAO.cadastrarCliente(dadosSeparados),"Cadastrar clientes",JOptionPane.INFORMATION_MESSAGE );
+
+    JOptionPane.showMessageDialog(null,clienteMapDAO.cadastrarCliente(dadosJuntos),"Cadastrar clientes",JOptionPane.INFORMATION_MESSAGE );
 
 
 

@@ -1,27 +1,26 @@
 package DAO;
-
+import Util.ValidacaoUtil;
 import Domain.Cliente;
-
-import javax.swing.*;
 import java.util.*;
 
 public class ClienteMapDAO implements IClienteDAO {
 
-
+    private ValidacaoUtil validacaoUtil;
     private final Map<Long, Cliente> clientes = new HashMap<>();
 
     @Override
-    public String cadastrarCliente(String[] dadosSeparados) {
-        if(isValidCpf(dadosSeparados[1]) && isValidEmail(dadosSeparados[3])){
+    public String cadastrarCliente(String dadosJuntos) {
+        String[] dadosSeparados = dadosJuntos.split(",");
+        if(!validacaoUtil.isValidCpf(dadosSeparados[1]) || !validacaoUtil.isValidEmail(dadosSeparados[3])){
             return "CPF Ou Email Invalido";
         }
-            Cliente construtorCliente = new Cliente(dadosSeparados[0],converterCpf(dadosSeparados[1]),dadosSeparados[2],dadosSeparados[3],dadosSeparados[4]);
+            Cliente construtorCliente = new Cliente(dadosSeparados[0],validacaoUtil.converterCpf(dadosSeparados[1]),dadosSeparados[2],dadosSeparados[3],dadosSeparados[4]);
 
-            if(clientes.containsKey(converterCpf(dadosSeparados[1]))){
+            if(clientes.containsKey(validacaoUtil.converterCpf(dadosSeparados[1]))){
 
                 return "Cliente já está cadastrado";
             }else{
-                clientes.put(converterCpf(dadosSeparados[1]),construtorCliente);
+                clientes.put(validacaoUtil.converterCpf(dadosSeparados[1]),construtorCliente);
                 return "Cliente cadastrado com sucesso!";
             }
 
@@ -33,29 +32,40 @@ public class ClienteMapDAO implements IClienteDAO {
 
     @Override
     public String alterarCliente(String cpf, String editar,String novaInformacao) {
-        if(!isValidCpf(cpf)){
+        if(!validacaoUtil.isValidCpf(cpf)){
             return "CPF invalido.";
         }else if (!editar.matches("(?i)nome|cpf|telefone|email|endereco")) {
             return "Opção de edição invalida.";
 
         }else{
+            Long longCPF = validacaoUtil.converterCpf(cpf);
 
-            if(editar.equalsIgnoreCase("nome")){
-                clientes.get(converterCpf(cpf)).setNome(novaInformacao);
-            }else if(editar.equalsIgnoreCase("cpf")){
-                if(!isValidCpf(novaInformacao)){
-                    return "Novo CPF invalido!.";
-                }
-                clientes.get(converterCpf(cpf)).setCpf(converterCpf(novaInformacao));
-            }else if(editar.equalsIgnoreCase("telefone")){
-                clientes.get(converterCpf(cpf)).setTelefone(novaInformacao);
-            }else if(editar.equalsIgnoreCase("email")){
-                if (!isValidEmail(novaInformacao)) {
-                    return "Novo Email invalido!.";
-                }
-                clientes.get(converterCpf(cpf)).setEmail(novaInformacao);
-            }else if(editar.equalsIgnoreCase("Endereco")||editar.equalsIgnoreCase("endereço")){
-            clientes.get(converterCpf(cpf)).setEndereco(novaInformacao);
+            switch (editar.toLowerCase()){
+                case "nome":
+                    clientes.get(longCPF).setNome(novaInformacao);
+                    break;
+
+                case "cpf":
+                    if(!validacaoUtil.isValidCpf(novaInformacao)){
+                        return "Novo CPF invalido!.";
+                    }
+                    clientes.get(longCPF).setCpf(validacaoUtil.converterCpf(novaInformacao));
+                    break;
+
+                case "telefone":
+                    clientes.get(longCPF).setTelefone(novaInformacao);
+                    break;
+
+                case "email":
+                    if (!validacaoUtil.isValidEmail(novaInformacao)) {
+                        return "Novo Email invalido!.";
+                    }
+                    clientes.get(longCPF).setEmail(novaInformacao);
+                    break;
+
+                case "endereco":
+                    clientes.get(longCPF).setEndereco(novaInformacao);
+                    break;
             }
 
         }
@@ -66,10 +76,10 @@ public class ClienteMapDAO implements IClienteDAO {
 
     @Override
     public String excluirCliente(String cpf) {
-        if(!isValidCpf(cpf)){
+        if(!validacaoUtil.isValidCpf(cpf)){
             return "CPF invalido.";
         }
-            clientes.remove(converterCpf(cpf));
+            clientes.remove(validacaoUtil.converterCpf(cpf));
             return "Cadastro excluido com sucesso!";
 
 
@@ -78,35 +88,22 @@ public class ClienteMapDAO implements IClienteDAO {
 
     @Override
     public String listarCliente() {
-        return "Lista Clientes: \n\n" + clientes.values() + "\n\n" "quantidad" + clientes.size();
+        return "Lista Clientes: \n\n" + clientes.values() + "\n\n" + "quantidad" + clientes.size();
     }
 
     @Override
     public String buscarCliente(String cpf) {
-        if(!isValidCpf(cpf)){
+        if(!validacaoUtil.isValidCpf(cpf)){
             return "CPF invalido.";
         }
-
-        if(clientes.containsKey(converterCpf(cpf))){
-            return "Cliente encontrado!\n"+clientes.get(converterCpf(cpf)) ;
+        Long longCPF = validacaoUtil.converterCpf(cpf);
+        if(clientes.containsKey(longCPF)){
+            return "Cliente encontrado!\n"+clientes.get(longCPF) ;
 
         }else {
             return "Cadastro não encontrado" ;
         }
     }
 
-    public Long converterCpf(String cpf){
 
-        String stringCpf = cpf.replaceAll("\\D","");
-
-        return Long.parseLong(stringCpf);
-    }
-
-    public boolean isValidCpf(String cpf){
-        return cpf.matches("\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}");
-    }
-
-    public boolean isValidEmail(String email){
-        return email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
-    }
 }

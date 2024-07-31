@@ -4,7 +4,7 @@ import Domain.Cliente;
 
 public interface IClienteDAO {
 
-    public String cadastrarCliente(String[] dadosSeparados);
+    public String cadastrarCliente(String dadosJuntos);
 
     public String alterarCliente(String cpf, String editar,String novaInformacao);
 
