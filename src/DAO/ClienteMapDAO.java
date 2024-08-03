@@ -11,6 +11,9 @@ public class ClienteMapDAO implements IClienteDAO {
     @Override
     public String cadastrarCliente(String dadosJuntos) {
         String[] dadosSeparados = dadosJuntos.split(",");
+        if(!validacaoUtil.isValidCampo(dadosSeparados)){
+            return "Campos não preenchidos corretamente";
+        }
         if(!validacaoUtil.isValidCpf(dadosSeparados[1]) || !validacaoUtil.isValidEmail(dadosSeparados[3])){
             return "CPF Ou Email Invalido";
         }

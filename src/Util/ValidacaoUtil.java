@@ -17,4 +17,13 @@ public class ValidacaoUtil {
         return email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
     }
 
+    public boolean isValidCampo(String[] campo){
+        for(String e: campo){
+            if(e == null || e.equals("")){
+                return false;
+            }
+        }
+        return true;
+    }
+
 }
